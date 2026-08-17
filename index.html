@@ -5,18 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Profil Mahasiswa Baru — Teknik Informatika</title>
 
-    <!--
-  ============================================================
-  CARA MENGEDIT (baca ini dulu):
-  1. Cari semua tulisan di dalam kurung siku seperti [NAMA LENGKAP]
-     lalu ganti dengan data kamu sendiri.
-  2. Foto: siapkan 4 file di folder yang sama dengan file ini:
-     profil.jpg, foto1.jpg, foto2.jpg, foto3.jpg
-     Kalau file belum ada, kotak foto tetap tampil rapi sebagai placeholder.
-  3. Simpan file ini dengan nama index.html
-  ============================================================
--->
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -78,8 +66,11 @@
       .topbar .wrap {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 16px;
         height: 64px;
+        margin: 0 auto;
+        position: relative;
       }
       .brand {
         font-family: "JetBrains Mono", monospace;
@@ -110,6 +101,111 @@
       .menu a:hover {
         color: var(--ink);
         background: rgba(19, 28, 46, 0.06);
+      }
+
+      /* Sembunyikan tombol hamburger di tampilan desktop */
+      .menu-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: var(--card);
+        border: 1.5px solid var(--line);
+        border-radius: 100px;
+        cursor: pointer;
+        padding: 0;
+        flex-shrink: 0;
+        transition: border-color 0.18s, background 0.18s;
+      }
+      .menu-toggle:hover {
+        border-color: var(--ink);
+      }
+      .menu-toggle:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      /* Ikon hamburger dibuat dari garis CSS, bukan gambar, supaya bisa
+         dianimasikan berubah jadi tanda silang (X) saat menu terbuka. */
+      .hamburger {
+        position: relative;
+        width: 18px;
+        height: 13px;
+      }
+      .hamburger span {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--ink);
+        transition: transform 0.28s ease, opacity 0.2s ease, top 0.28s ease;
+      }
+      .hamburger span:nth-child(1) {
+        top: 0;
+      }
+      .hamburger span:nth-child(2) {
+        top: 5.5px;
+      }
+      .hamburger span:nth-child(3) {
+        top: 11px;
+      }
+      .menu-toggle[aria-expanded="true"] .hamburger span:nth-child(1) {
+        top: 5.5px;
+        transform: rotate(45deg);
+      }
+      .menu-toggle[aria-expanded="true"] .hamburger span:nth-child(2) {
+        opacity: 0;
+      }
+      .menu-toggle[aria-expanded="true"] .hamburger span:nth-child(3) {
+        top: 5.5px;
+        transform: rotate(-45deg);
+      }
+
+      /* --- Media Query untuk Mobile (Layar di bawah 768px) --- */
+      @media screen and (max-width: 768px) {
+        /* Tampilkan tombol hamburger */
+        .menu-toggle {
+          display: flex;
+        }
+
+        /* Menu dropdown mobile, disembunyikan lewat animasi bukan display:none,
+           supaya transisi buka/tutup terasa halus. */
+        .topbar .menu {
+          position: absolute;
+          top: calc(100% + 10px);
+          right: 0;
+          left: auto;
+          width: min(280px, calc(100vw - 40px));
+          margin: 0;
+          flex-direction: column;
+          gap: 2px;
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-radius: 14px;
+          box-shadow: var(--shadow);
+          padding: 10px;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-8px);
+          transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+        }
+
+        .topbar .menu.active {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+
+        .topbar .menu a {
+          padding: 12px 14px;
+          border-radius: 8px;
+          font-size: 15.5px;
+        }
+        .topbar .menu a:hover {
+          background: rgba(19, 28, 46, 0.06);
+        }
       }
 
       /* ---------- Umum ---------- */
@@ -489,7 +585,7 @@
         }
         .idcard {
           max-width: 340px;
-          margin-inline: auto;
+          /* margin-inline: auto; */
           transform: none;
         }
         .gallery {
@@ -511,10 +607,6 @@
           height: 58px;
           gap: 10px;
         }
-        .menu a {
-          padding: 6px 9px;
-          font-size: 13.5px;
-        }
         .field {
           grid-template-columns: 1fr;
           gap: 4px;
@@ -533,13 +625,29 @@
   <body>
     <header class="topbar">
       <div class="wrap">
-        <span class="brand">TI &middot; Kelompok 07</span>
-        <nav class="menu">
+        <div class="" style="display: flex; align-items: center; gap: 10px">
+          <img
+            src="/images/logo-undiksha.png"
+            alt="logo-undiksha"
+            style="width: 40px; height: 40px"
+          />
+          <span class="brand">TI &middot; Kelompok Decimal</span>
+        </div>
+
+        <nav class="menu" id="menu">
           <a href="#beranda">Beranda</a>
           <a href="#biodata">Biodata</a>
           <a href="#galeri">Galeri</a>
           <a href="#kontak">Kontak</a>
         </nav>
+        <button
+          class="menu-toggle"
+          aria-label="Buka menu"
+          aria-expanded="false"
+          aria-controls="menu"
+        >
+          <span class="hamburger"><span></span><span></span><span></span></span>
+        </button>
       </div>
     </header>
 
@@ -552,7 +660,7 @@
             <h1>Ni Kadek Bella Citra Dewi</h1>
             <p class="lead">
               Mahasiswa baru <strong>S1 Sistem Informasi</strong>, Jurusan
-              Teknik Informatika. Biasa dipanggil
+              Teknik Informatika Universitas Pendidikan Ganesha. Biasa dipanggil
               <span class="mark">BELLA</span>, asal dari Badung. Halaman ini
               saya buat untuk memperkenalkan diri: siapa saya, dari mana, dan ke
               mana saya ingin melangkah.
@@ -566,9 +674,8 @@
           <div class="idcard reveal">
             <div class="punch"></div>
             <div class="photo">
-              <span class="ph">profil.jpg<br />belum ditambahkan</span>
               <img
-                src="profil.jpg"
+                src="images/foto_profile_bella.jpeg"
                 alt="Foto diri Ni Kadek Bella Citra Dewi"
                 onerror="this.remove()"
               />
@@ -580,11 +687,11 @@
               </div>
               <div class="row">
                 <dt>Kelompok</dt>
-                <dd>Cipher</dd>
+                <dd>Decimal</dd>
               </div>
               <div class="row">
                 <dt>No. Urut</dt>
-                <dd>07</dd>
+                <dd>16</dd>
               </div>
             </dl>
             <span class="stamp">Mahasiswa Baru</span>
@@ -612,12 +719,12 @@
               <dd>Bella</dd>
             </div>
             <div class="field">
-              <dt>No. urut kelompok</dt>
-              <dd>07</dd>
+              <dt>No. urut</dt>
+              <dd>16</dd>
             </div>
             <div class="field">
               <dt>Nama kelompok</dt>
-              <dd>Cipher</dd>
+              <dd>Decimal</dd>
             </div>
             <div class="field">
               <dt>Alamat asal</dt>
@@ -633,20 +740,24 @@
             </div>
             <div class="field">
               <dt>Hobi</dt>
-              <dd>[HOBI 1], [HOBI 2], dan [HOBI 3]</dd>
+              <dd>Menggambar</dd>
             </div>
             <div class="field">
               <dt>Alasan memilih TI</dt>
               <dd>
-                [Tulis 2&ndash;4 kalimat. Contoh kerangka: apa yang pertama kali
-                menarik minatmu ke bidang teknologi, kenapa memilih jurusan
-                Teknik Informatika dan program studi ini secara khusus, serta
-                apa yang ingin kamu pelajari selama kuliah.]
+                Awalnya saya tertarik dengan teknologi karena penasaran
+                bagaimana teknologi bisa mempermudah berbagai aktivitas
+                sehari-hari. Saya memilih Jurusan Teknik Informatika, khususnya
+                Program Studi Sistem Informasi, karena ingin belajar lebih jauh
+                tentang teknologi sekaligus bagaimana sistem dapat digunakan
+                untuk membantu menyelesaikan suatu masalah. Selama kuliah, saya
+                ingin belajar tentang pembuatan sistem, pengolahan data, dan
+                hal-hal baru di bidang teknologi.
               </dd>
             </div>
             <div class="field">
               <dt>Cita-cita</dt>
-              <dd>[Tulis cita-citamu dan alasan singkatnya.]</dd>
+              <dd>UI/UX Designer, Digital Marketing</dd>
             </div>
           </dl>
         </div>
@@ -661,46 +772,42 @@
           <div class="gallery">
             <figure class="shot reveal">
               <div class="frame">
-                <span class="ph">foto1.jpg<br />belum ditambahkan</span>
                 <img
-                  src="foto1.jpg"
-                  alt="[Deskripsi singkat foto pertama]"
+                  src="/images/gallery-1.jpeg"
+                  alt="Momen kelulusan SMA Negeri 2 Kuta Utara pada tahun 2026"
                   onerror="this.remove()"
                 />
               </div>
               <figcaption>
-                <b>[Judul Foto 1]</b>[Keterangan singkat, misalnya tempat dan
-                tahun.]
+                <b>Graduation SMA</b>Momen kelulusan SMA Negeri 2 Kuta Utara
+                pada tahun 2026
               </figcaption>
             </figure>
 
             <figure class="shot reveal">
               <div class="frame">
-                <span class="ph">foto2.jpg<br />belum ditambahkan</span>
                 <img
-                  src="foto2.jpg"
-                  alt="[Deskripsi singkat foto kedua]"
+                  src="/images/gallery-2.jpeg"
+                  alt="Pada saat mengikuti workshop upgrade tentang kita di sekolah"
                   onerror="this.remove()"
                 />
               </div>
               <figcaption>
-                <b>[Judul Foto 2]</b>[Keterangan singkat, misalnya tempat dan
-                tahun.]
+                <b>Mengikuti workshop</b> Pada saat mengikuti workshop upgrade
+                tentang kita di sekolah
               </figcaption>
             </figure>
 
             <figure class="shot reveal">
               <div class="frame">
-                <span class="ph">foto3.jpg<br />belum ditambahkan</span>
                 <img
-                  src="foto3.jpg"
-                  alt="[Deskripsi singkat foto ketiga]"
+                  src="/images/gallery-3.jpeg"
+                  alt="Mengikuti ekstra melukis pada saat SMP"
                   onerror="this.remove()"
                 />
               </div>
               <figcaption>
-                <b>[Judul Foto 3]</b>[Keterangan singkat, misalnya tempat dan
-                tahun.]
+                <b>Menggambar</b> Mengikuti ekstra melukis pada saat SMP
               </figcaption>
             </figure>
           </div>
@@ -747,13 +854,13 @@
               </a>
               <a
                 class="link"
-                href="https://github.com/[USERNAME]"
+                href="https://github.com/bellacitra"
                 target="_blank"
                 rel="noopener"
               >
                 <span
                   ><span class="tag">GitHub</span
-                  ><span class="val">@[USERNAME]</span></span
+                  ><span class="val">@bellacitra</span></span
                 >
               </a>
             </div>
@@ -787,6 +894,56 @@
       document.querySelectorAll(".reveal").forEach((el, i) => {
         el.style.transitionDelay = (i % 3) * 70 + "ms";
         io.observe(el);
+      });
+
+      // ---------- Menu mobile ----------
+      const menuToggle = document.querySelector(".menu-toggle");
+      const menu = document.getElementById("menu");
+
+      function openMenu() {
+        menu.classList.add("active");
+        menuToggle.setAttribute("aria-expanded", "true");
+        menuToggle.setAttribute("aria-label", "Tutup menu");
+      }
+      function closeMenu() {
+        menu.classList.remove("active");
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Buka menu");
+      }
+      function toggleMenu() {
+        const isOpen = menu.classList.contains("active");
+        isOpen ? closeMenu() : openMenu();
+      }
+
+      menuToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      // Tutup menu saat salah satu link diklik
+      menu.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", closeMenu);
+      });
+
+      // Tutup menu saat klik di luar area menu/tombol
+      document.addEventListener("click", (e) => {
+        if (
+          menu.classList.contains("active") &&
+          !menu.contains(e.target) &&
+          !menuToggle.contains(e.target)
+        ) {
+          closeMenu();
+        }
+      });
+
+      // Tutup menu saat menekan tombol Escape
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeMenu();
+      });
+
+      // Tutup menu otomatis jika layar dilebarkan melewati breakpoint mobile
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) closeMenu();
       });
     </script>
   </body>
