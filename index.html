@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profil Mahasiswa Baru — Teknik Informatika</title>
+
+    <!--
+  ============================================================
+  CARA MENGEDIT (baca ini dulu):
+  1. Cari semua tulisan di dalam kurung siku seperti [NAMA LENGKAP]
+     lalu ganti dengan data kamu sendiri.
+  2. Foto: siapkan 4 file di folder yang sama dengan file ini:
+     profil.jpg, foto1.jpg, foto2.jpg, foto3.jpg
+     Kalau file belum ada, kotak foto tetap tampil rapi sebagai placeholder.
+  3. Simpan file ini dengan nama index.html
+  ============================================================
+-->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --ink: #131c2e;
+        --ink-soft: #5a657c;
+        --paper: #f6f5f0;
+        --line: #e2e0d6;
+        --accent: #1f4bd8;
+        --mark: #ffe066;
+        --card: #ffffff;
+        --radius: 14px;
+        --shadow: 0 1px 2px rgba(19, 28, 46, 0.06),
+          0 12px 32px rgba(19, 28, 46, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 76px;
+      }
+
+      body {
+        font-family: "Public Sans", -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color: var(--ink);
+        background-color: var(--paper);
+        background-image: linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 28px 28px;
+        line-height: 1.65;
+        font-size: 17px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .wrap {
+        width: min(1080px, 92vw);
+        margin-inline: auto;
+      }
+
+      /* ---------- Navigasi ---------- */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(246, 245, 240, 0.88);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar .wrap {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 64px;
+      }
+      .brand {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        border: 1.5px solid var(--ink);
+        border-radius: 100px;
+        padding: 5px 12px;
+        white-space: nowrap;
+      }
+      .menu {
+        margin-left: auto;
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .menu a {
+        font-size: 14.5px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        text-decoration: none;
+        padding: 7px 12px;
+        border-radius: 100px;
+        transition: color 0.18s, background 0.18s;
+      }
+      .menu a:hover {
+        color: var(--ink);
+        background: rgba(19, 28, 46, 0.06);
+      }
+
+      /* ---------- Umum ---------- */
+      .section {
+        padding: 88px 0;
+      }
+      .eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .eyebrow::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+
+      h2.title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-size: clamp(28px, 4.4vw, 40px);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        margin-bottom: 32px;
+      }
+
+      .mark {
+        background: linear-gradient(transparent 62%, var(--mark) 62%);
+        padding-inline: 2px;
+      }
+
+      /* ---------- Beranda ---------- */
+      .hero {
+        padding: 72px 0 80px;
+      }
+      .hero .wrap {
+        display: grid;
+        grid-template-columns: 1.25fr 0.85fr;
+        gap: 56px;
+        align-items: center;
+      }
+      .hello {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        margin-bottom: 18px;
+      }
+      .hero h1 {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-size: clamp(40px, 7.2vw, 72px);
+        font-weight: 800;
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+        margin-bottom: 20px;
+      }
+      .lead {
+        font-size: clamp(17px, 2vw, 19.5px);
+        color: var(--ink-soft);
+        max-width: 46ch;
+      }
+      .lead strong {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+      }
+      .btn {
+        display: inline-block;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 12px 22px;
+        border-radius: 100px;
+        transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+      }
+      .btn-solid {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .btn-solid:hover {
+        background: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+      .btn-ghost {
+        border: 1.5px solid var(--line);
+        color: var(--ink);
+        background: var(--card);
+      }
+      .btn-ghost:hover {
+        border-color: var(--ink);
+        transform: translateY(-2px);
+      }
+
+      /* Kartu identitas — elemen khas halaman ini */
+      .idcard {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 22px 22px 24px;
+        box-shadow: var(--shadow);
+        transform: rotate(-1.6deg);
+        transition: transform 0.35s ease;
+      }
+      .idcard:hover {
+        transform: rotate(0deg);
+      }
+      .idcard .punch {
+        width: 52px;
+        height: 8px;
+        border-radius: 100px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        margin: 0 auto 18px;
+      }
+      .idcard .photo {
+        aspect-ratio: 3/4;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #ecebe4;
+        border: 1px solid var(--line);
+        position: relative;
+        display: grid;
+        place-items: center;
+      }
+      .idcard .photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: relative;
+        z-index: 1;
+      }
+      .ph {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11.5px;
+        color: #9a9a8e;
+        text-align: center;
+        padding: 8px;
+        line-height: 1.5;
+      }
+      .idcard .rows {
+        margin-top: 18px;
+        border-top: 1px dashed var(--line);
+        padding-top: 16px;
+      }
+      .idcard .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        font-size: 14px;
+        padding: 5px 0;
+      }
+      .idcard .row dt {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        padding-top: 3px;
+      }
+      .idcard .row dd {
+        font-weight: 600;
+        text-align: right;
+      }
+      .stamp {
+        margin-top: 16px;
+        display: inline-block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+        border: 1.5px solid var(--accent);
+        border-radius: 6px;
+        padding: 5px 10px;
+        transform: rotate(-2deg);
+        opacity: 0.9;
+      }
+
+      /* ---------- Biodata ---------- */
+      .biodata {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+      .field {
+        display: grid;
+        grid-template-columns: 230px 1fr;
+        gap: 20px;
+        padding: 18px 26px;
+        border-bottom: 1px solid var(--line);
+      }
+      .field:last-child {
+        border-bottom: 0;
+      }
+      .field:nth-child(even) {
+        background: #fcfcfa;
+      }
+      .field dt {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11.5px;
+        font-weight: 500;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        padding-top: 4px;
+      }
+      .field dd {
+        font-size: 16.5px;
+      }
+
+      /* ---------- Galeri ---------- */
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+      }
+      .shot {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 12px;
+        box-shadow: var(--shadow);
+      }
+      .frame {
+        aspect-ratio: 4/5;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #ecebe4;
+        display: grid;
+        place-items: center;
+        position: relative;
+      }
+      .frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: relative;
+        z-index: 1;
+        transition: transform 0.5s ease;
+      }
+      .shot:hover .frame img {
+        transform: scale(1.04);
+      }
+      .shot figcaption {
+        padding: 14px 6px 6px;
+        font-size: 14.5px;
+        color: var(--ink-soft);
+      }
+      .shot figcaption b {
+        display: block;
+        color: var(--ink);
+        font-weight: 600;
+        font-size: 15.5px;
+        margin-bottom: 2px;
+      }
+
+      /* ---------- Kontak ---------- */
+      .contact {
+        background: var(--ink);
+        color: var(--paper);
+        border-radius: var(--radius);
+        padding: clamp(30px, 5vw, 52px);
+      }
+      .contact h2 {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-size: clamp(26px, 4vw, 36px);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 10px;
+      }
+      .contact p {
+        color: #b9c0d0;
+        max-width: 48ch;
+        margin-bottom: 30px;
+      }
+      .links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 12px;
+      }
+      .link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: var(--paper);
+        border: 1px solid rgba(246, 245, 240, 0.22);
+        border-radius: 10px;
+        padding: 14px 16px;
+        transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      }
+      .link:hover {
+        background: rgba(246, 245, 240, 0.08);
+        border-color: rgba(246, 245, 240, 0.5);
+        transform: translateY(-2px);
+      }
+      .link .tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #8e99b0;
+        display: block;
+      }
+      .link .val {
+        font-size: 15px;
+        font-weight: 500;
+        word-break: break-all;
+      }
+
+      footer {
+        padding: 34px 0 48px;
+        text-align: center;
+        font-size: 13.5px;
+        color: var(--ink-soft);
+      }
+
+      /* ---------- Animasi masuk ---------- */
+      .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+      .reveal.on {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ---------- Aksesibilitas ---------- */
+      a:focus-visible,
+      .link:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 6px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+        .idcard {
+          transform: none;
+        }
+      }
+
+      /* ---------- Responsif ---------- */
+      @media (max-width: 900px) {
+        .hero .wrap {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .idcard {
+          max-width: 340px;
+          margin-inline: auto;
+          transform: none;
+        }
+        .gallery {
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+      }
+      @media (max-width: 640px) {
+        body {
+          font-size: 16px;
+        }
+        .section {
+          padding: 60px 0;
+        }
+        .hero {
+          padding: 48px 0 56px;
+        }
+        .topbar .wrap {
+          height: 58px;
+          gap: 10px;
+        }
+        .menu a {
+          padding: 6px 9px;
+          font-size: 13.5px;
+        }
+        .field {
+          grid-template-columns: 1fr;
+          gap: 4px;
+          padding: 16px 18px;
+        }
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+        .cta-row .btn {
+          flex: 1;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap">
+        <span class="brand">TI &middot; Kelompok 07</span>
+        <nav class="menu">
+          <a href="#beranda">Beranda</a>
+          <a href="#biodata">Biodata</a>
+          <a href="#galeri">Galeri</a>
+          <a href="#kontak">Kontak</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- =============== BERANDA =============== -->
+    <main>
+      <section class="hero" id="beranda">
+        <div class="wrap">
+          <div class="reveal">
+            <p class="hello">Halo, perkenalkan &mdash;</p>
+            <h1>Ni Kadek Bella Citra Dewi</h1>
+            <p class="lead">
+              Mahasiswa baru <strong>S1 Sistem Informasi</strong>, Jurusan
+              Teknik Informatika. Biasa dipanggil
+              <span class="mark">BELLA</span>, asal dari Badung. Halaman ini
+              saya buat untuk memperkenalkan diri: siapa saya, dari mana, dan ke
+              mana saya ingin melangkah.
+            </p>
+            <div class="cta-row">
+              <a class="btn btn-solid" href="#biodata">Lihat biodata</a>
+              <a class="btn btn-ghost" href="#galeri">Lihat galeri</a>
+            </div>
+          </div>
+
+          <div class="idcard reveal">
+            <div class="punch"></div>
+            <div class="photo">
+              <span class="ph">profil.jpg<br />belum ditambahkan</span>
+              <img
+                src="profil.jpg"
+                alt="Foto diri Ni Kadek Bella Citra Dewi"
+                onerror="this.remove()"
+              />
+            </div>
+            <dl class="rows">
+              <div class="row">
+                <dt>NIM</dt>
+                <dd>2615091065</dd>
+              </div>
+              <div class="row">
+                <dt>Kelompok</dt>
+                <dd>Cipher</dd>
+              </div>
+              <div class="row">
+                <dt>No. Urut</dt>
+                <dd>07</dd>
+              </div>
+            </dl>
+            <span class="stamp">Mahasiswa Baru</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============== BIODATA =============== -->
+      <section class="section" id="biodata">
+        <div class="wrap">
+          <p class="eyebrow reveal">Biodata Diri</p>
+          <h2 class="title reveal">Data lengkap saya</h2>
+
+          <dl class="biodata reveal">
+            <div class="field">
+              <dt>NIM</dt>
+              <dd>2615091065</dd>
+            </div>
+            <div class="field">
+              <dt>Nama lengkap</dt>
+              <dd>Ni Kadek Bella Citra Dewi</dd>
+            </div>
+            <div class="field">
+              <dt>Nama panggilan</dt>
+              <dd>Bella</dd>
+            </div>
+            <div class="field">
+              <dt>No. urut kelompok</dt>
+              <dd>07</dd>
+            </div>
+            <div class="field">
+              <dt>Nama kelompok</dt>
+              <dd>Cipher</dd>
+            </div>
+            <div class="field">
+              <dt>Alamat asal</dt>
+              <dd>JL. Rahayu GG. 46/1 LINGK. Batubidak</dd>
+            </div>
+            <div class="field">
+              <dt>Asal sekolah</dt>
+              <dd>SMA NEGERI 2 KUTA UTARA</dd>
+            </div>
+            <div class="field">
+              <dt>Program studi</dt>
+              <dd>S1 Sistem Informasi, Jurusan Teknik Informatika</dd>
+            </div>
+            <div class="field">
+              <dt>Hobi</dt>
+              <dd>[HOBI 1], [HOBI 2], dan [HOBI 3]</dd>
+            </div>
+            <div class="field">
+              <dt>Alasan memilih TI</dt>
+              <dd>
+                [Tulis 2&ndash;4 kalimat. Contoh kerangka: apa yang pertama kali
+                menarik minatmu ke bidang teknologi, kenapa memilih jurusan
+                Teknik Informatika dan program studi ini secara khusus, serta
+                apa yang ingin kamu pelajari selama kuliah.]
+              </dd>
+            </div>
+            <div class="field">
+              <dt>Cita-cita</dt>
+              <dd>[Tulis cita-citamu dan alasan singkatnya.]</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- =============== GALERI =============== -->
+      <section class="section" id="galeri">
+        <div class="wrap">
+          <p class="eyebrow reveal">Galeri</p>
+          <h2 class="title reveal">Beberapa momen</h2>
+
+          <div class="gallery">
+            <figure class="shot reveal">
+              <div class="frame">
+                <span class="ph">foto1.jpg<br />belum ditambahkan</span>
+                <img
+                  src="foto1.jpg"
+                  alt="[Deskripsi singkat foto pertama]"
+                  onerror="this.remove()"
+                />
+              </div>
+              <figcaption>
+                <b>[Judul Foto 1]</b>[Keterangan singkat, misalnya tempat dan
+                tahun.]
+              </figcaption>
+            </figure>
+
+            <figure class="shot reveal">
+              <div class="frame">
+                <span class="ph">foto2.jpg<br />belum ditambahkan</span>
+                <img
+                  src="foto2.jpg"
+                  alt="[Deskripsi singkat foto kedua]"
+                  onerror="this.remove()"
+                />
+              </div>
+              <figcaption>
+                <b>[Judul Foto 2]</b>[Keterangan singkat, misalnya tempat dan
+                tahun.]
+              </figcaption>
+            </figure>
+
+            <figure class="shot reveal">
+              <div class="frame">
+                <span class="ph">foto3.jpg<br />belum ditambahkan</span>
+                <img
+                  src="foto3.jpg"
+                  alt="[Deskripsi singkat foto ketiga]"
+                  onerror="this.remove()"
+                />
+              </div>
+              <figcaption>
+                <b>[Judul Foto 3]</b>[Keterangan singkat, misalnya tempat dan
+                tahun.]
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============== KONTAK =============== -->
+      <section class="section" id="kontak">
+        <div class="wrap">
+          <div class="contact reveal">
+            <h2>Mari terhubung</h2>
+            <p>
+              Silakan hubungi saya lewat kanal di bawah ini. Senang berkenalan
+              dengan teman-teman satu angkatan.
+            </p>
+            <div class="links">
+              <a class="link" href="mailto:bellacitra2612@gmail.com">
+                <span
+                  ><span class="tag">Email</span
+                  ><span class="val">bellacitra2612@gmail.com</span></span
+                >
+              </a>
+              <a
+                class="link"
+                href="https://instagram.com/bellaacitra_"
+                target="_blank"
+                rel="noopener"
+              >
+                <span
+                  ><span class="tag">Instagram</span
+                  ><span class="val">@bellaacitra_</span></span
+                >
+              </a>
+              <a
+                class="link"
+                href="https://linkedin.com/in/bellaacitra"
+                target="_blank"
+                rel="noopener"
+              >
+                <span
+                  ><span class="tag">LinkedIn</span
+                  ><span class="val">Ni Kadek Bella Citra Dewi</span></span
+                >
+              </a>
+              <a
+                class="link"
+                href="https://github.com/[USERNAME]"
+                target="_blank"
+                rel="noopener"
+              >
+                <span
+                  ><span class="tag">GitHub</span
+                  ><span class="val">@[USERNAME]</span></span
+                >
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        &copy; <span id="tahun">2026</span> Ni Kadek Bella Citra Dewi &middot;
+        2615091065 &middot; Teknik Informatika
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("tahun").textContent = new Date().getFullYear();
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("on");
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      );
+
+      document.querySelectorAll(".reveal").forEach((el, i) => {
+        el.style.transitionDelay = (i % 3) * 70 + "ms";
+        io.observe(el);
+      });
+    </script>
+  </body>
+</html>
