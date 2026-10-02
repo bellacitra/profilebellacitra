@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator IPK & Target Nilai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F7FB; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6884; --line:#D5DCE8;
+  --marker:#FFD84D; --marker-ink:#14213D; --ok:#1F7A5A; --bad:#B3261E; --zone:#E8EDF5; --focus:#2F5BD3;
+  --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1524; --surface:#162038; --ink:#E7ECF6; --muted:#9AA7C2; --line:#2A3756;
+    --marker:#F5CC3A; --marker-ink:#14213D; --ok:#4FC394; --bad:#FF8A80; --zone:#1D2945; --focus:#8EA9FF;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1524; --surface:#162038; --ink:#E7ECF6; --muted:#9AA7C2; --line:#2A3756;
+  --marker:#F5CC3A; --marker-ink:#14213D; --ok:#4FC394; --bad:#FF8A80; --zone:#1D2945; --focus:#8EA9FF;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums}
+.wrap{max-width:960px;margin:0 auto;padding:24px 20px 64px}
+h1{font-size:1.05rem;font-weight:700;margin:0;letter-spacing:-.01em}
+h2{font-size:1.4rem;font-weight:800;margin:0 0 4px;letter-spacing:-.02em}
+h3{font-size:1rem;font-weight:700;margin:0}
+p.lead{color:var(--muted);margin:0 0 20px;max-width:62ch}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* Header: the IPK ruler is the one bold element */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.top .actions{display:flex;gap:8px;flex-wrap:wrap}
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 22px 18px;margin-bottom:22px}
+.hero-row{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap}
+.ipk-num{font-size:clamp(4rem,14vw,7.5rem);font-weight:800;line-height:.85;letter-spacing:-.05em}
+.ipk-side{padding-bottom:6px}
+.ipk-side .k{color:var(--muted);font-size:.9rem}
+.ipk-side .v{font-weight:700;font-size:1.1rem}
+.predikat{display:inline-block;background:var(--marker);color:var(--marker-ink);font-weight:700;padding:2px 10px;border-radius:4px;margin-top:4px}
+.ruler{position:relative;margin:22px 0 8px;height:40px}
+.ruler .track{position:absolute;left:0;right:0;top:0;height:14px;display:flex;border-radius:7px;overflow:hidden;background:var(--zone)}
+.ruler .z{height:100%;border-left:2px solid var(--surface)}
+.ruler .z1{background:color-mix(in srgb,var(--ink) 18%,transparent)}
+.ruler .z2{background:color-mix(in srgb,var(--ink) 34%,transparent)}
+.ruler .z3{background:color-mix(in srgb,var(--ink) 55%,transparent)}
+.ruler .pin{position:absolute;top:-6px;width:4px;height:26px;background:var(--marker);border:1px solid var(--ink);border-radius:2px;transform:translateX(-50%);transition:left .4s ease}
+.ruler .ticks{position:absolute;left:0;right:0;top:20px;font-size:.75rem;color:var(--muted)}
+.ruler .ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.ruler .ticks span:first-child{transform:none}
+.ruler .ticks span:last-child{transform:translateX(-100%)}
+.ruler .zl{position:absolute;top:38px;font-size:.72rem;color:var(--muted);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.ruler .pin{transition:none}}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow-x:auto}
+.tab{background:none;border:0;padding:10px 14px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+[hidden]{display:none!important}
+
+/* Buttons */
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:.9rem}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.ghost{border-color:transparent;background:none;color:var(--muted)}
+.btn.ghost:hover{color:var(--bad);border-color:transparent}
+.icon-btn{background:none;border:0;cursor:pointer;color:var(--muted);padding:6px 8px;border-radius:6px;font-size:1.05rem;line-height:1}
+.icon-btn:hover{color:var(--bad);background:var(--zone)}
+
+/* Semester blocks */
+.sem{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:16px}
+.sem-head{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.sem-head input.sem-name{font-weight:700;border:1px solid transparent;background:none;padding:4px 6px;border-radius:6px;min-width:0;flex:1 1 160px}
+.sem-head input.sem-name:hover,.sem-head input.sem-name:focus{border-color:var(--line)}
+.ips{font-size:.9rem;color:var(--muted)}
+.ips b{color:var(--ink);font-size:1.1rem}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:480px}
+th{font-size:.8rem;color:var(--muted);font-weight:600;text-align:left;padding:8px 14px 4px}
+td{padding:4px 14px;border-top:1px solid var(--line)}
+tr:first-child td{border-top:0}
+td input,td select,.field input,.field select{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+td.num input{text-align:right}
+td.mutu{text-align:right;color:var(--muted);width:70px}
+th.r{text-align:right}
+.sem-foot{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:8px}
+.empty{padding:28px 18px;text-align:center;color:var(--muted)}
+
+/* Forms */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.field label{display:block;font-size:.85rem;font-weight:600;margin-bottom:4px}
+.field small{display:block;color:var(--muted);font-size:.78rem;margin-top:3px}
+.result{margin-top:16px;padding:16px;border-radius:10px;background:var(--zone)}
+.result .big{font-size:2.4rem;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.result .big mark{background:var(--marker);color:var(--marker-ink);padding:0 8px;border-radius:4px}
+.result p{margin:6px 0 0;max-width:62ch}
+.ok{color:var(--ok)} .bad{color:var(--bad)}
+.note{font-size:.85rem;color:var(--muted)}
+.row-between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (max-width:560px){
+  .wrap{padding:16px 12px 48px}
+  .hero{padding:18px 14px 14px}
+  .ruler .t276{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>Kalkulator IPK & Target Nilai</h1>
+    <div class="actions">
+      <button class="btn" id="btnExport" type="button">Ekspor JSON</button>
+      <button class="btn" id="btnImport" type="button">Impor JSON</button>
+      <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    </div>
+  </div>
+
+  <section class="hero" aria-label="Ringkasan IPK">
+    <div class="hero-row">
+      <div>
+        <div class="ipk-side"><span class="k">IPK kamu</span></div>
+        <div class="ipk-num" id="ipkNum">0.00</div>
+      </div>
+      <div class="ipk-side">
+        <div class="k">Total SKS lulus</div>
+        <div class="v" id="totSks">0</div>
+        <div class="predikat" id="predikat">Belum ada nilai</div>
+      </div>
+    </div>
+    <div class="ruler" aria-hidden="true">
+      <div class="track">
+        <div class="z" style="width:69%"></div>
+        <div class="z z1" style="width:6%"></div>
+        <div class="z z2" style="width:12.5%"></div>
+        <div class="z z3" style="width:12.5%"></div>
+      </div>
+      <div class="pin" id="pin" style="left:0%"></div>
+      <div class="ticks"><span style="left:0">0.00</span><span style="left:50%">2.00</span><span class="t276" style="left:69%">2.76</span><span style="left:75%">3.00</span><span style="left:87.5%">3.50</span><span style="left:100%">4.00</span></div>
+    </div>
+    <p class="note" style="margin:0">Predikat kelulusan S1: memuaskan 2.76–3.00, sangat memuaskan 3.01–3.50, dengan pujian di atas 3.50.</p>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="transkrip">Transkrip</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="uas">Target nilai UAS</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="ipk">Target IPK</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="skala">Skala nilai</button>
+  </div>
+
+  <!-- TRANSKRIP -->
+  <section data-panel="transkrip">
+    <div class="row-between">
+      <div>
+        <h2>Transkrip</h2>
+        <p class="lead" style="margin:0">Masukkan mata kuliah per semester. IPS dan IPK dihitung otomatis dan tersimpan di perangkat ini.</p>
+      </div>
+      <button class="btn primary" id="addSem" type="button">Tambah semester</button>
+    </div>
+    <div id="semList"></div>
+  </section>
+
+  <!-- TARGET UAS -->
+  <section data-panel="uas" hidden>
+    <h2>Berapa nilai UAS yang saya butuhkan?</h2>
+    <p class="lead">Isi bobot penilaian dari kontrak kuliah dan nilai yang sudah kamu dapat. Kosongkan komponen yang tidak ada dengan bobot 0.</p>
+    <div class="panel">
+      <div class="grid">
+        <div class="field"><label for="wT">Bobot tugas/kuis (%)</label><input id="wT" type="number" min="0" max="100" inputmode="decimal"></div>
+        <div class="field"><label for="wU">Bobot UTS (%)</label><input id="wU" type="number" min="0" max="100" inputmode="decimal"></div>
+        <div class="field"><label for="wA">Bobot UAS (%)</label><input id="wA" type="number" min="0" max="100" inputmode="decimal"></div>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <div class="field"><label for="nT">Nilai tugas/kuis</label><input id="nT" type="number" min="0" max="100" inputmode="decimal"><small>Rata-rata, skala 0–100</small></div>
+        <div class="field"><label for="nU">Nilai UTS</label><input id="nU" type="number" min="0" max="100" inputmode="decimal"><small>Skala 0–100</small></div>
+        <div class="field"><label for="tgt">Target nilai huruf</label><select id="tgt"></select><small id="tgtHint"></small></div>
+      </div>
+      <div class="result" id="uasResult" aria-live="polite"></div>
+    </div>
+    <div class="panel">
+      <h3 style="margin-bottom:8px">Kebutuhan UAS untuk setiap nilai huruf</h3>
+      <div class="table-wrap"><table id="uasTable"></table></div>
+    </div>
+  </section>
+
+  <!-- TARGET IPK -->
+  <section data-panel="ipk" hidden>
+    <h2>Berapa IPS yang perlu saya capai?</h2>
+    <p class="lead">Hitung rata-rata IPS yang dibutuhkan pada SKS berikutnya agar IPK mencapai target.</p>
+    <div class="panel">
+      <div class="grid">
+        <div class="field"><label for="curIpk">IPK saat ini</label><input id="curIpk" type="number" step="0.01" min="0" max="4" inputmode="decimal"><small><button class="btn ghost" id="useTranscript" type="button" style="padding:0;color:var(--focus)">Ambil dari transkrip</button></small></div>
+        <div class="field"><label for="curSks">SKS yang sudah ditempuh</label><input id="curSks" type="number" min="0" inputmode="numeric"></div>
+        <div class="field"><label for="nextSks">SKS yang akan diambil</label><input id="nextSks" type="number" min="1" inputmode="numeric"><small>Satu semester atau total beberapa semester</small></div>
+        <div class="field"><label for="tgtIpk">Target IPK</label><input id="tgtIpk" type="number" step="0.01" min="0" max="4" inputmode="decimal"></div>
+      </div>
+      <div class="result" id="ipkResult" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- SKALA -->
+  <section data-panel="skala" hidden>
+    <h2>Skala nilai</h2>
+    <p class="lead">Sesuaikan dengan pedoman akademik kampusmu. Bobot dipakai untuk menghitung IPK; batas angka dipakai untuk kalkulator UAS.</p>
+    <div class="panel">
+      <div class="row-between">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" id="presetA" type="button">Pakai A, A-, B+ …</button>
+          <button class="btn" id="presetAB" type="button">Pakai A, AB, B, BC …</button>
+        </div>
+        <button class="btn" id="addGrade" type="button">Tambah nilai huruf</button>
+      </div>
+      <div class="table-wrap"><table id="scaleTable"></table></div>
+      <p class="note">Mengubah nama huruf akan membuat mata kuliah yang memakai huruf lama tidak terhitung sampai nilainya dipilih ulang.</p>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  const KEY = "kalkulator-ipk-v1";
+  const PRESET_A = [
+    {l:"A",w:4,min:85},{l:"A-",w:3.75,min:80},{l:"B+",w:3.5,min:75},{l:"B",w:3,min:70},
+    {l:"B-",w:2.75,min:65},{l:"C+",w:2.5,min:60},{l:"C",w:2,min:55},{l:"D",w:1,min:45},{l:"E",w:0,min:0}
+  ];
+  const PRESET_AB = [
+    {l:"A",w:4,min:80},{l:"AB",w:3.5,min:73},{l:"B",w:3,min:66},{l:"BC",w:2.5,min:60},
+    {l:"C",w:2,min:55},{l:"D",w:1,min:40},{l:"E",w:0,min:0}
+  ];
+  const uid = () => Math.random().toString(36).slice(2,10);
+  const clone = o => JSON.parse(JSON.stringify(o));
+
+  function defaults(){
+    return {
+      scale: clone(PRESET_A),
+      semesters: [{id:uid(),name:"Semester 1",courses:[
+        {id:uid(),name:"Kalkulus I",sks:3,grade:"A-"},
+        {id:uid(),name:"Pengantar Teknologi Informasi",sks:2,grade:"A"},
+        {id:uid(),name:"Bahasa Indonesia",sks:2,grade:"B+"}
+      ]}],
+      uas:{wT:30,wU:30,wA:40,nT:80,nU:75,tgt:"A"},
+      ipk:{curIpk:"",curSks:"",nextSks:20,tgtIpk:3.51}
+    };
+  }
+
+  let S;
+  try{
+    const raw = localStorage.getItem(KEY);
+    S = raw ? JSON.parse(raw) : defaults();
+  }catch(e){ S = defaults(); }
+  if(!S || !Array.isArray(S.semesters) || !Array.isArray(S.scale)) S = defaults();
+
+  let saveTimer;
+  function save(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }, 150);
+  }
+
+  const $ = id => document.getElementById(id);
+  const num = v => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
+  const fmt = (n,d=2) => isFinite(n) ? n.toFixed(d) : "–";
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const weightOf = l => { const g = S.scale.find(x=>x.l===l); return g ? g.w : null; };
+
+  function toast(msg){
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove("show"), 2200);
+  }
+
+  /* ---------- Calculations ---------- */
+  function semStats(sem){
+    let sks=0, mutu=0;
+    sem.courses.forEach(c=>{
+      const w = weightOf(c.grade), k = num(c.sks);
+      if(w!==null && isFinite(k) && k>0){ sks+=k; mutu+=k*w; }
+    });
+    return {sks, mutu, ip: sks ? mutu/sks : NaN};
+  }
+  function totalStats(){
+    let sks=0, mutu=0;
+    S.semesters.forEach(s=>{ const st=semStats(s); sks+=st.sks; mutu+=st.mutu; });
+    return {sks, mutu, ip: sks ? mutu/sks : NaN};
+  }
+  function predikatOf(ipk){
+    if(!isFinite(ipk)) return "Belum ada nilai";
+    if(ipk>3.5) return "Dengan pujian";
+    if(ipk>3.0) return "Sangat memuaskan";
+    if(ipk>=2.76) return "Memuaskan";
+    return "Di bawah predikat kelulusan";
+  }
+
+  /* ---------- Header ---------- */
+  function renderHeader(){
+    const t = totalStats();
+    $("ipkNum").textContent = isFinite(t.ip) ? t.ip.toFixed(2) : "0.00";
+    $("totSks").textContent = t.sks;
+    $("predikat").textContent = predikatOf(t.ip);
+    $("pin").style.left = (isFinite(t.ip) ? Math.min(100, t.ip/4*100) : 0) + "%";
+  }
+
+  /* ---------- Transkrip ---------- */
+  function gradeOptions(sel){
+    let h = '<option value="">Pilih</option>';
+    S.scale.forEach(g=>{ h += `<option value="${esc(g.l)}"${g.l===sel?" selected":""}>${esc(g.l)} (${g.w})</option>`; });
+    if(sel && weightOf(sel)===null) h += `<option value="${esc(sel)}" selected>${esc(sel)} (tidak ada di skala)</option>`;
+    return h;
+  }
+  function renderSemesters(){
+    const box = $("semList");
+    if(!S.semesters.length){
+      box.innerHTML = '<div class="sem empty">Belum ada semester. Tekan “Tambah semester” untuk mulai mengisi transkrip.</div>';
+      renderHeader(); return;
+    }
+    box.innerHTML = S.semesters.map(sem=>{
+      const st = semStats(sem);
+      const rows = sem.courses.map(c=>{
+        const w = weightOf(c.grade), k=num(c.sks);
+        const m = (w!==null && isFinite(k)) ? fmt(w*k) : "–";
+        return `<tr data-cid="${c.id}">
+          <td><input aria-label="Nama mata kuliah" data-f="name" value="${esc(c.name)}" placeholder="Nama mata kuliah"></td>
+          <td class="num" style="width:90px"><input aria-label="SKS" data-f="sks" type="number" min="0" max="24" inputmode="numeric" value="${esc(c.sks)}"></td>
+          <td style="width:150px"><select aria-label="Nilai" data-f="grade">${gradeOptions(c.grade)}</select></td>
+          <td class="mutu" data-mutu>${m}</td>
+          <td style="width:44px;padding-left:0"><button class="icon-btn" data-act="delCourse" title="Hapus mata kuliah" aria-label="Hapus ${esc(c.name||'mata kuliah')}">✕</button></td>
+        </tr>`;
+      }).join("");
+      return `<div class="sem" data-sid="${sem.id}">
+        <div class="sem-head">
+          <input class="sem-name" aria-label="Nama semester" data-f="semName" value="${esc(sem.name)}">
+          <span class="ips">IPS <b data-ips>${fmt(st.ip)}</b> · <span data-sks>${st.sks}</span> SKS</span>
+          <button class="btn ghost" data-act="delSem" type="button">Hapus semester</button>
+        </div>
+        ${sem.courses.length ? `<div class="table-wrap"><table>
+          <thead><tr><th>Mata kuliah</th><th>SKS</th><th>Nilai</th><th class="r">Mutu</th><th></th></tr></thead>
+          <tbody>${rows}</tbody></table></div>` : '<div class="empty">Belum ada mata kuliah di semester ini.</div>'}
+        <div class="sem-foot"><button class="btn" data-act="addCourse" type="button">Tambah mata kuliah</button></div>
+      </div>`;
+    }).join("");
+    renderHeader();
+  }
+  function refreshSemNumbers(semEl, sem){
+    const st = semStats(sem);
+    semEl.querySelector("[data-ips]").textContent = fmt(st.ip);
+    semEl.querySelector("[data-sks]").textContent = st.sks;
+    sem.courses.forEach(c=>{
+      const tr = semEl.querySelector(`tr[data-cid="${c.id}"]`); if(!tr) return;
+      const w = weightOf(c.grade), k=num(c.sks);
+      tr.querySelector("[data-mutu]").textContent = (w!==null && isFinite(k)) ? fmt(w*k) : "–";
+    });
+    renderHeader();
+  }
+
+  $("semList").addEventListener("input", e=>{
+    const semEl = e.target.closest(".sem"); if(!semEl) return;
+    const sem = S.semesters.find(s=>s.id===semEl.dataset.sid); if(!sem) return;
+    const f = e.target.dataset.f;
+    if(f==="semName"){ sem.name = e.target.value; save(); return; }
+    const tr = e.target.closest("tr"); if(!tr) return;
+    const c = sem.courses.find(x=>x.id===tr.dataset.cid); if(!c) return;
+    c[f] = f==="sks" ? e.target.value : e.target.value;
+    save(); refreshSemNumbers(semEl, sem);
+  });
+  $("semList").addEventListener("click", e=>{
+    const b = e.target.closest("[data-act]"); if(!b) return;
+    const semEl = b.closest(".sem"); const sem = S.semesters.find(s=>s.id===semEl.dataset.sid);
+    const act = b.dataset.act;
+    if(act==="addCourse"){
+      const nc = {id:uid(),name:"",sks:3,grade:""};
+      sem.courses.push(nc); save(); renderSemesters();
+      const inp = document.querySelector(`tr[data-cid="${nc.id}"] input[data-f="name"]`); if(inp) inp.focus();
+    } else if(act==="delCourse"){
+      const cid = b.closest("tr").dataset.cid;
+      sem.courses = sem.courses.filter(c=>c.id!==cid); save(); renderSemesters();
+    } else if(act==="delSem"){
+      if(sem.courses.length && !confirm(`Hapus ${sem.name} beserta ${sem.courses.length} mata kuliahnya?`)) return;
+      S.semesters = S.semesters.filter(s=>s!==sem); save(); renderSemesters(); toast("Semester dihapus");
+    }
+  });
+  $("addSem").addEventListener("click", ()=>{
+    S.semesters.push({id:uid(),name:"Semester "+(S.semesters.length+1),courses:[{id:uid(),name:"",sks:3,grade:""}]});
+    save(); renderSemesters();
+    const last = $("semList").lastElementChild; if(last){ last.scrollIntoView({behavior:"smooth",block:"start"}); const i=last.querySelector('input[data-f="name"]'); if(i) i.focus({preventScroll:true}); }
+  });
+
+  /* ---------- Target UAS ---------- */
+  const UAS_FIELDS = ["wT","wU","wA","nT","nU"];
+  function renderUasInputs(){
+    UAS_FIELDS.forEach(k=>{ $(k).value = S.uas[k]; });
+    const sorted = [...S.scale].sort((a,b)=>b.min-a.min);
+    if(!sorted.find(g=>g.l===S.uas.tgt) && sorted.length) S.uas.tgt = sorted[0].l;
+    $("tgt").innerHTML = sorted.map(g=>`<option value="${esc(g.l)}"${g.l===S.uas.tgt?" selected":""}>${esc(g.l)}</option>`).join("");
+  }
+  function neededUas(min){
+    const wT=num(S.uas.wT)||0, wU=num(S.uas.wU)||0, wA=num(S.uas.wA)||0;
+    const nT=num(S.uas.nT)||0, nU=num(S.uas.nU)||0;
+    const sum = wT+wU+wA;
+    if(wA<=0 || sum<=0) return NaN;
+    return (min*sum - wT*nT - wU*nU)/wA;
+  }
+  function renderUas(){
+    const wT=num(S.uas.wT)||0, wU=num(S.uas.wU)||0, wA=num(S.uas.wA)||0, sum=wT+wU+wA;
+    const g = S.scale.find(x=>x.l===S.uas.tgt);
+    const out = $("uasResult");
+    $("tgtHint").textContent = g ? `Nilai akhir minimal ${g.min}` : "";
+    if(wA<=0){ out.innerHTML = '<p class="bad">Bobot UAS harus lebih dari 0 agar kebutuhan nilai UAS bisa dihitung.</p>'; }
+    else if(!g){ out.innerHTML = '<p>Pilih target nilai huruf.</p>'; }
+    else{
+      const need = neededUas(g.min);
+      let warn = Math.abs(sum-100)>0.01 ? `<p class="note">Total bobot saat ini ${fmt(sum,0)}%, bukan 100%. Perhitungan tetap memakai proporsi bobot.</p>` : "";
+      if(need<=0){
+        out.innerHTML = `<div class="big ok">Sudah aman</div><p>Dengan nilai sekarang, kamu tetap mendapat <b>${esc(g.l)}</b> berapa pun nilai UAS-mu (asal tidak ada syarat minimal UAS dari dosen).</p>${warn}`;
+      } else if(need>100){
+        out.innerHTML = `<div class="big bad">${fmt(need,1)}</div><p>Butuh UAS ${fmt(need,1)}, di atas 100, jadi <b>${esc(g.l)}</b> tidak bisa dicapai dengan bobot ini. Cek tabel di bawah untuk target yang masih realistis.</p>${warn}`;
+      } else {
+        out.innerHTML = `<div class="big"><mark>${fmt(Math.ceil(need*10)/10,1)}</mark></div><p>Nilai UAS minimal agar nilai akhirmu mencapai ${g.min} dan mendapat <b>${esc(g.l)}</b>.</p>${warn}`;
+      }
+    }
+    const sorted = [...S.scale].sort((a,b)=>b.min-a.min);
+    $("uasTable").innerHTML = `<thead><tr><th>Nilai huruf</th><th>Nilai akhir minimal</th><th class="r">UAS dibutuhkan</th></tr></thead><tbody>` +
+      sorted.map(x=>{
+        const n = neededUas(x.min);
+        let cell = !isFinite(n) ? "–" : n<=0 ? '<span class="ok">Sudah aman</span>' : n>100 ? '<span class="bad">Tidak mungkin</span>' : fmt(Math.ceil(n*10)/10,1);
+        return `<tr><td><b>${esc(x.l)}</b></td><td>${x.min}</td><td style="text-align:right">${cell}</td></tr>`;
+      }).join("") + "</tbody>";
+  }
+  UAS_FIELDS.forEach(k=>$(k).addEventListener("input", e=>{ S.uas[k]=e.target.value; save(); renderUas(); }));
+  $("tgt").addEventListener("change", e=>{ S.uas.tgt=e.target.value; save(); renderUas(); });
+
+  /* ---------- Target IPK ---------- */
+  const IPK_FIELDS = ["curIpk","curSks","nextSks","tgtIpk"];
+  function fillFromTranscript(){
+    const t = totalStats();
+    if(t.sks){ S.ipk.curIpk = t.ip.toFixed(2); S.ipk.curSks = t.sks; }
+  }
+  function renderIpkInputs(){ IPK_FIELDS.forEach(k=>{ $(k).value = S.ipk[k]; }); }
+  function renderIpk(){
+    const ipk=num(S.ipk.curIpk), cs=num(S.ipk.curSks), ns=num(S.ipk.nextSks), tg=num(S.ipk.tgtIpk);
+    const out=$("ipkResult");
+    if(![ipk,cs,ns,tg].every(isFinite) || ns<=0){ out.innerHTML='<p>Lengkapi keempat isian di atas untuk melihat hasilnya.</p>'; return; }
+    const need = (tg*(cs+ns) - ipk*cs)/ns;
+    const maxIpk = (ipk*cs + 4*ns)/(cs+ns);
+    if(need<=0){
+      out.innerHTML = `<div class="big ok">Sudah tercapai</div><p>IPK-mu sudah di atas target dan akan tetap di atas ${fmt(tg)} setelah ${ns} SKS berikutnya.</p>`;
+    } else if(need>4){
+      out.innerHTML = `<div class="big bad">${fmt(need)}</div><p>IPS ${fmt(need)} melebihi 4.00, jadi target ${fmt(tg)} belum bisa dicapai dalam ${ns} SKS. IPK tertinggi yang mungkin: <b>${fmt(maxIpk)}</b>. Coba tambah jumlah SKS yang dihitung.</p>`;
+    } else {
+      out.innerHTML = `<div class="big"><mark>${fmt(need)}</mark></div><p>Rata-rata IPS minimal pada ${ns} SKS berikutnya agar IPK-mu menjadi minimal ${fmt(tg)} (sekarang ${fmt(ipk)}). Kalau semua A, IPK-mu bisa mencapai ${fmt(maxIpk)}.</p>`;
+    }
+  }
+  IPK_FIELDS.forEach(k=>$(k).addEventListener("input", e=>{ S.ipk[k]=e.target.value; save(); renderIpk(); }));
+  $("useTranscript").addEventListener("click", ()=>{
+    const t=totalStats();
+    if(!t.sks){ toast("Transkrip masih kosong"); return; }
+    fillFromTranscript(); save(); renderIpkInputs(); renderIpk(); toast("IPK dan SKS diambil dari transkrip");
+  });
+
+  /* ---------- Skala ---------- */
+  function renderScale(){
+    $("scaleTable").innerHTML = `<thead><tr><th>Huruf</th><th>Bobot</th><th>Nilai akhir minimal</th><th></th></tr></thead><tbody>` +
+      S.scale.map((g,i)=>`<tr data-i="${i}">
+        <td><input aria-label="Huruf" data-f="l" value="${esc(g.l)}"></td>
+        <td class="num"><input aria-label="Bobot" data-f="w" type="number" step="0.01" min="0" max="4" value="${g.w}"></td>
+        <td class="num"><input aria-label="Nilai minimal" data-f="min" type="number" min="0" max="100" value="${g.min}"></td>
+        <td style="width:44px;padding-left:0"><button class="icon-btn" data-act="delGrade" aria-label="Hapus ${esc(g.l)}">✕</button></td>
+      </tr>`).join("") + "</tbody>";
+  }
+  function afterScaleChange(){ save(); renderSemesters(); renderUasInputs(); renderUas(); }
+  $("scaleTable").addEventListener("input", e=>{
+    const tr=e.target.closest("tr"); if(!tr) return;
+    const g=S.scale[+tr.dataset.i]; const f=e.target.dataset.f;
+    if(f==="l") g.l = e.target.value.trim();
+    else { const n=num(e.target.value); if(isFinite(n)) g[f]=n; }
+    afterScaleChange();
+  });
+  $("scaleTable").addEventListener("click", e=>{
+    const b=e.target.closest('[data-act="delGrade"]'); if(!b) return;
+    S.scale.splice(+b.closest("tr").dataset.i,1); renderScale(); afterScaleChange();
+  });
+  $("addGrade").addEventListener("click", ()=>{ S.scale.push({l:"",w:0,min:0}); renderScale(); afterScaleChange(); });
+  $("presetA").addEventListener("click", ()=>{ S.scale=clone(PRESET_A); renderScale(); afterScaleChange(); toast("Skala A, A-, B+ dipakai"); });
+  $("presetAB").addEventListener("click", ()=>{ S.scale=clone(PRESET_AB); renderScale(); afterScaleChange(); toast("Skala A, AB, B, BC dipakai"); });
+
+  /* ---------- Tabs ---------- */
+  document.querySelector(".tabs").addEventListener("click", e=>{
+    const t=e.target.closest(".tab"); if(!t) return;
+    document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", x===t ? "true":"false"));
+    document.querySelectorAll("[data-panel]").forEach(p=>p.hidden = p.dataset.panel!==t.dataset.tab);
+    if(t.dataset.tab==="ipk" && S.ipk.curIpk===""){ fillFromTranscript(); renderIpkInputs(); renderIpk(); }
+  });
+
+  /* ---------- Export / Import ---------- */
+  $("btnExport").addEventListener("click", async ()=>{
+    const data = JSON.stringify({app:"kalkulator-ipk",version:1,exportedAt:new Date().toISOString(),...S}, null, 2);
+    const filename = "data-ipk-" + new Date().toISOString().slice(0,10) + ".json";
+    let dl = null;
+    try{ if(window.claude && typeof window.claude.use==="function") dl = await window.claude.use("downloads"); }catch(e){ dl=null; }
+    if(dl){
+      try{ await dl.save({filename, data}); toast("File disimpan"); }catch(e){ toast("Penyimpanan dibatalkan"); }
+      return;
+    }
+    const url = URL.createObjectURL(new Blob([data],{type:"application/json"}));
+    const a = document.createElement("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    toast("File diekspor");
+  });
+  $("btnImport").addEventListener("click", ()=>$("fileImport").click());
+  $("fileImport").addEventListener("change", e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{
+      try{
+        const d = JSON.parse(r.result);
+        if(!Array.isArray(d.semesters) || !Array.isArray(d.scale)) throw new Error("format");
+        const def = defaults();
+        S = { scale:d.scale, semesters:d.semesters.map(s=>({id:s.id||uid(),name:s.name||"Semester",courses:(s.courses||[]).map(c=>({id:c.id||uid(),name:c.name||"",sks:c.sks??"",grade:c.grade||""}))})),
+              uas:{...def.uas,...(d.uas||{})}, ipk:{...def.ipk,...(d.ipk||{})} };
+        save(); renderAll(); toast("Data berhasil diimpor");
+      }catch(err){ toast("File tidak dikenali. Pilih file JSON hasil ekspor aplikasi ini."); }
+      e.target.value="";
+    };
+    r.readAsText(f);
+  });
+
+  function renderAll(){ renderSemesters(); renderUasInputs(); renderUas(); renderIpkInputs(); renderIpk(); renderScale(); }
+  renderAll();
+})();
+</script>
+</body>
+</html>
